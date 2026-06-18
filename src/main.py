@@ -2,10 +2,10 @@
 
 print("hello world")
 
-import textnode
+from textnode import TextNode, TextType
 
-def main():
-    print(textnode.TextNode("This is some anchor text", textnode.TextType('link'), "https://www.boot.dev"))
+def main() -> None:
+    print(TextNode("This is some anchor text", TextType.LINK, "https://www.boot.dev"))
 
 
 main()
