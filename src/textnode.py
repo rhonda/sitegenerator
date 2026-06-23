@@ -55,3 +55,24 @@ def text_node_to_html_node(text_node: TextNode) -> LeafNode:
 
         case _:
             raise ValueError("Unkown textnode type")
+
+
+
+def split_nodes_delimiter(old_nodes: list[TextNode], delimiter: str, text_type: TextType) -> list[TextNode]:
+    new_nodes = []
+
+    for node in old_nodes:
+        if node.text_type != TextType.TEXT:
+            new_nodes.append(node)
+            continue
+        
+        node_parts = node.text.split(delimiter)
+        if not len(node_parts) % 2:
+            raise ValueError(f"Uneven {delimiter} in {node.text}")
+
+        in_between = False
+        for part in node_parts:
+            new_nodes.append(TextNode(part, text_type if in_between else TextType.TEXT))
+            in_between = not in_between
+
+    return new_nodes

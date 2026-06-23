@@ -1,5 +1,5 @@
 import unittest
-from textnode import TextNode, TextType, text_node_to_html_node
+from textnode import TextNode, TextType, text_node_to_html_node, split_nodes_delimiter
 
 class TestTextNode(unittest.TestCase):
     def test_eq(self):
@@ -32,6 +32,9 @@ class TestTextNode(unittest.TestCase):
         node2 = TextNode("This is a text node", TextType.BOLD)
         self.assertEqual(node, node2)
 
+
+
+class TestTextNodeToHTMLNode(unittest.TestCase):
     def test_text(self):
         node = TextNode("This is a text node", TextType.TEXT)
         html_node = text_node_to_html_node(node)
@@ -69,6 +72,47 @@ class TestTextNode(unittest.TestCase):
         self.assertEqual(html_node.tag, "img")
         self.assertEqual(html_node.value, None)
         self.assertEqual(html_node.props, {"src": "https://www.debian.org/favicon.ico"})
+
+
+
+class TestTextSplitNodeDelimeter(unittest.TestCase):
+    def test_MDToText_bold(self):
+        node = TextNode("This is text with a **bolded phrase** in the middle", TextType.TEXT)
+        split_nodes = split_nodes_delimiter([node], '**', TextType.BOLD)
+        self.assertEqual(split_nodes, [
+            TextNode("This is text with a ", TextType.TEXT), 
+            TextNode("bolded phrase", TextType.BOLD), 
+            TextNode(" in the middle", TextType.TEXT), 
+            ])
+
+    def test_MDToText_three_bold(self):
+        node = TextNode("This is text with a **bolded phrase** in the **middle", TextType.TEXT)
+        with self.assertRaises(ValueError):
+            split_nodes = split_nodes_delimiter([node], '**', TextType.BOLD)
+
+    def test_MDToText_two_italic(self):
+        node = TextNode("_Two_ italic parts at start and _end_", TextType.TEXT)
+        split_nodes = split_nodes_delimiter([node], '_', TextType.ITALIC)
+        self.assertEqual(split_nodes, [
+            TextNode("", TextType.TEXT), 
+            TextNode("Two", TextType.ITALIC), 
+            TextNode(" italic parts at start and ", TextType.TEXT), 
+            TextNode("end", TextType.ITALIC), 
+            TextNode("", TextType.TEXT), 
+            ])
+
+    def test_MDToText_bold_italic(self):
+        node = TextNode("Now we got **bold** and _italic_ in here.", TextType.TEXT)
+        split_nodes = split_nodes_delimiter([node], '_', TextType.ITALIC)
+        split_nodes = split_nodes_delimiter(split_nodes, '**', TextType.BOLD)
+        self.assertEqual(split_nodes, [
+            TextNode("Now we got ", TextType.TEXT), 
+            TextNode("bold", TextType.BOLD), 
+            TextNode(" and ", TextType.TEXT), 
+            TextNode("italic", TextType.ITALIC), 
+            TextNode(" in here.", TextType.TEXT), 
+            ])
+
 
 if __name__ == "__main__":
     unittest.main()
