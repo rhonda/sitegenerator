@@ -94,11 +94,9 @@ class TestTextSplitNodeDelimeter(unittest.TestCase):
         node = TextNode("_Two_ italic parts at start and _end_", TextType.TEXT)
         split_nodes = split_nodes_delimiter([node], '_', TextType.ITALIC)
         self.assertEqual(split_nodes, [
-            TextNode("", TextType.TEXT), 
             TextNode("Two", TextType.ITALIC), 
             TextNode(" italic parts at start and ", TextType.TEXT), 
             TextNode("end", TextType.ITALIC), 
-            TextNode("", TextType.TEXT), 
             ])
 
     def test_MDToText_bold_italic(self):
@@ -111,6 +109,14 @@ class TestTextSplitNodeDelimeter(unittest.TestCase):
             TextNode(" and ", TextType.TEXT), 
             TextNode("italic", TextType.ITALIC), 
             TextNode(" in here.", TextType.TEXT), 
+            ])
+
+
+    def test_MDToText_code(self):
+        node = TextNode("`This is one big code block`", TextType.TEXT)
+        split_nodes = split_nodes_delimiter([node], '`', TextType.CODE)
+        self.assertEqual(split_nodes, [
+            TextNode("This is one big code block", TextType.CODE),
             ])
 
 

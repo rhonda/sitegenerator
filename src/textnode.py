@@ -70,9 +70,10 @@ def split_nodes_delimiter(old_nodes: list[TextNode], delimiter: str, text_type: 
         if not len(node_parts) % 2:
             raise ValueError(f"Uneven {delimiter} in {node.text}")
 
-        in_between = False
-        for part in node_parts:
-            new_nodes.append(TextNode(part, text_type if in_between else TextType.TEXT))
-            in_between = not in_between
+        for i, part in enumerate(node_parts):
+            if part == "":
+                continue
+
+            new_nodes.append(TextNode(part, TextType.TEXT if i % 2 == 0 else text_type))
 
     return new_nodes
