@@ -1,5 +1,6 @@
 from enum import Enum
 from htmlnode import LeafNode
+import re
 
 
 class TextType(Enum):
@@ -77,3 +78,13 @@ def split_nodes_delimiter(old_nodes: list[TextNode], delimiter: str, text_type: 
             new_nodes.append(TextNode(part, TextType.TEXT if i % 2 == 0 else text_type))
 
     return new_nodes
+
+
+
+def extract_markdown_images(text: str) -> list[tuple]:
+    return re.findall(r"\!\[([^\]]*)\]\(([^\)]*)\)", text)
+
+
+
+def extract_markdown_links(text: str) -> list[tuple]:
+    return re.findall(r"\[([^\]]*)\]\(([^\)]*)\)", text)
